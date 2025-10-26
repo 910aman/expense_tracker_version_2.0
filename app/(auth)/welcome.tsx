@@ -59,7 +59,7 @@ const Welcome = () => {
               .springify()
               .damping(12)} style={styles.buttonContainer}>
             {/* Button Component */}
-            <Button onPress={() => router.push("/(auth)/register")}>
+            <Button onPress={() => router.push("/(tabs)/profile")}>
               <Typo size={22} color={colors.neutral900} fontWeight="600">
                 Get Started
               </Typo>

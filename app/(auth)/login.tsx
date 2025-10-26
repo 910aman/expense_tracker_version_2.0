@@ -20,19 +20,24 @@ const Login = () => {
   const { login: loginUser } = useAuth();
   const handleSubmit = async () => {
     // Handle login logic here
-    if (!emailRef.current || !pwdRef.current) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-    setIsLoading(true);
-    const res = await loginUser(emailRef.current, pwdRef.current);
-    console.log("Responses", res);
-    if (!res.success) {
-      Alert.alert("Sign Up", res.msg || "An error occurred during sign up");
+     try {
+      const res = await loginUser(emailRef.current, pwdRef.current);
+      console.log("Response:", res);
+
+      // Check if login failed
+      if (!res || !res.success) {
+        Alert.alert("Login Failed", res?.msg || "Invalid email or password");
+        setIsLoading(false);
+        return;
+      }
+
+      router.push("/(tabs)");
+    } catch (error) {
+      console.error("Login error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again later.");
+    } finally {
       setIsLoading(false);
-      return;
     }
-    setIsLoading(false);
   };
 
   return (
