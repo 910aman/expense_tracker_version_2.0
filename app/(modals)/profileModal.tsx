@@ -27,6 +27,7 @@ import * as ImagePicker from "expo-image-picker";
 const ProfileModal = () => {
   const [userData, setUserData] = useState<UserDataType>({
     name: "",
+    email: "",
     image: null,
   });
 
@@ -37,6 +38,7 @@ const ProfileModal = () => {
   useEffect(() => {
     setUserData({
       name: user?.name || "",
+      email: user?.email || "",
       image: user?.image || null,
     });
   }, [user]);
@@ -49,10 +51,10 @@ const ProfileModal = () => {
       quality: 0.5,
     });
 
-    console.log("result.assets Value = ",result.assets);
+    console.log("result.assets Value = ", result.assets);
 
     if (!result.canceled) {
-      setUserData({...userData, image: result.assets[0].uri});
+      setUserData({ ...userData, image: result.assets[0].uri });
     }
   };
 
@@ -104,6 +106,16 @@ const ProfileModal = () => {
               value={userData?.name}
               onChangeText={(value) =>
                 setUserData({ ...userData, name: value })
+              }
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200}>E-Mail</Typo>
+            <InputField
+              placeholder="E-Mail"
+              value={userData?.email}
+              onChangeText={(value) =>
+                setUserData({ ...userData, email: value })
               }
             />
           </View>

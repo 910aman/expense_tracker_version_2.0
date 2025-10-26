@@ -132,6 +132,7 @@ export type UserType = {
 
 export type UserDataType = {
   name: string;
+  email: string;
   image?: any;
 };
 
