@@ -13,7 +13,7 @@ const { height } = Dimensions.get("window");
 const ScreenWrapper = ({ style, children }: ScreenWrapperProps) => {
   let paddingTop = Platform.OS === "ios" ? height * 0.06 : 50;
   return (
-    <View style={[{ height, paddingTop, flex: 1, backgroundColor: colors.neutral700 },style]}>
+    <View style={[{ height, paddingTop, flex: 1, backgroundColor: colors.neutral900 },style]}>
       <StatusBar barStyle="light-content" />
       {children}
     </View>
