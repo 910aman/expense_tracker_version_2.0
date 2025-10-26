@@ -9,7 +9,7 @@ export default function Index() {
   const router = useRouter();
   useEffect(() => {
     setTimeout(() => {
-      router.push("/welcome");
+      router.push("/(auth)/welcome");
     }, 2000);
   },[]);
 

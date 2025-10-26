@@ -1,21 +1,38 @@
-import { StyleSheet, View } from "react-native";
+import { Alert, Pressable, StyleSheet, View } from "react-native";
 import React, { useRef, useState } from "react";
 import { verticalScale } from "@/utils/styling";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import BackButton from "@/components/BackButton";
 import Typo from "@/components/Typo";
-import Input from "@/components/Input";
 import InputField from "@/components/Input";
 import * as Icons from "phosphor-react-native";
 import Button from "@/components/Button";
+import { useRouter } from "expo-router";
+import { useAuth } from "@/context/authContext";
 
-const Register = () => {
+const Login = () => {
   const pwdRef = useRef("");
   const emailRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const { login: loginUser } = useAuth();
   const handleSubmit = async () => {
     // Handle login logic here
+    if (!emailRef.current || !pwdRef.current) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+    setIsLoading(true);
+    const res = await loginUser(emailRef.current, pwdRef.current);
+    console.log("Responses", res);
+    if (!res.success) {
+      Alert.alert("Sign Up", res.msg || "An error occurred during sign up");
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -52,7 +69,7 @@ const Register = () => {
             secureTextEntry
             onChangeText={(value) => (pwdRef.current = value)}
             icon={
-              <Icons.AtIcon
+              <Icons.LockIcon
                 size={verticalScale(26)}
                 color={colors.neutral300}
               />
@@ -67,13 +84,30 @@ const Register = () => {
               Login
             </Typo>
           </Button>
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Typo style={styles.footerText} size={15}>
+              Don&apos;t have an account?
+            </Typo>
+            <Pressable onPress={() => router.push("/(auth)/register")}>
+              <Typo
+                style={styles.footerText}
+                size={15}
+                fontWeight={"700"}
+                color={colors.primary}
+              >
+                Sign Up
+              </Typo>
+            </Pressable>
+          </View>
         </View>
       </View>
     </ScreenWrapper>
   );
 };
 
-export default Register;
+export default Login;
 
 const styles = StyleSheet.create({
   container: {
