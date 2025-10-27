@@ -1,6 +1,7 @@
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "@/constants";
 import { ResponseType } from "@/types";
 import axios from "axios";
+const defaultAvatar = "../images/defaultAvatar.png";
 
 const CLOUDINARY_CLOUD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
@@ -46,5 +47,12 @@ export const getProfileImage = (file: any) => {
   if (file && typeof file === "string") return file;
   if (file && typeof file === "object") return file.uri;
 
-  return require("../images/defaultAvatar.png");
+  return defaultAvatar;
+};
+
+export const getFilePath = (file: any) => {
+  if (file && typeof file === "string") return file;
+  if (file && typeof file === "object") return file.uri;
+
+  return defaultAvatar;
 };
