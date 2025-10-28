@@ -1,39 +1,42 @@
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import ModalWrapper from "@/components/ModalWrapper";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
-import { Image } from "expo-image";
-import { getProfileImage } from "@/services/ImageServices";
-import * as Icons from "phosphor-react-native";
 import Typo from "@/components/Typo";
 import InputField from "@/components/Input";
 import { WalletType } from "@/types";
 import Button from "@/components/Button";
 import { useAuth } from "@/context/authContext";
-import { updateUser } from "@/services/userService";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import ImageUpload from "@/components/ImageUpload";
+import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
+import * as Icons from "phosphor-react-native";
 
-const ProfileModal = () => {
+const WalletModal = () => {
   const [wallet, setWallet] = useState<WalletType>({
     name: "",
-    email: "",
     image: null,
   });
 
   const router = useRouter();
-  const { user, updateUserData } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  const oldWallet: { name: string; image: string; id: string } =
+    useLocalSearchParams();
+
+  useEffect(() => {
+    if (oldWallet?.id) {
+      setWallet({
+        name: oldWallet?.name,
+        image: oldWallet?.image,
+      });
+    }
+  }, []);
 
   const onPickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -52,26 +55,74 @@ const ProfileModal = () => {
 
   const onSubmit = async () => {
     let { name, image } = wallet;
-    if (!name.trim()) {
-      Alert.alert("User", "Please fill all the fields");
+    if (!name.trim() || !image) {
+      Alert.alert("Wallet", "Please fill all the fields");
       return;
     }
+
+    const data: WalletType = {
+      name,
+      image,
+      uid: user?.uid,
+    };
+
+    if (oldWallet?.id) data.id = oldWallet?.id;
     setLoading(true);
-    const res = await updateUser(user?.uid as string, wallet);
+    // const res = await (data);
+    const res = await createOrUpdateWallet(data);
     setLoading(false);
     if (res.success) {
       //Update user
-      updateUserData(user?.uid as string);
       router.back();
     } else {
-      Alert.alert("User", res.msg);
+      Alert.alert("Wallet", res.msg);
     }
+  };
+
+ const onDelete = async () => {
+  if (!oldWallet?.id) return;
+
+  try {
+    setLoading(true);
+    const res = await deleteWallet(oldWallet.id);
+    setLoading(false);
+
+    if (res?.success) {
+      router.push("/(tabs)/wallet");
+    } else {
+      Alert.alert("Wallet", res?.msg || "Failed to delete wallet");
+    }
+  } catch (error: any) {
+    setLoading(false);
+    console.error("Delete wallet error:", error);
+    Alert.alert("Wallet", "Something went wrong while deleting the wallet");
+  }
+};
+
+
+  const showDeleteAlert = () => {
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to do this? \n This action will remove all the transactions related to this wallet",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Delete"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => onDelete(),
+          style: "destructive",
+        },
+      ]
+    );
   };
   return (
     <ModalWrapper>
       <View style={styles.container}>
         <Header
-          title="New Wallet"
+          title={oldWallet?.id ? "Update Wallet" : "New Wallet"}
           leftIcon={<BackButton />}
           style={{ marginBottom: spacingY._10 }}
         />
@@ -86,7 +137,14 @@ const ProfileModal = () => {
           </View>
           <View style={styles.inputContainer}>
             <Typo color={colors.neutral200}>Wallet Icon</Typo>
-            <InputField
+            <ImageUpload
+              file={wallet.image}
+              onClear={() => setWallet({ ...wallet, image: null })}
+              onSelect={(file) => setWallet({ ...wallet, image: file })}
+              placeholder="Upload Image"
+            />
+          </View>
+          {/* <InputField
               placeholder="Salary"
               value={wallet?.email}
               onChangeText={(value) => setWallet({ ...wallet, email: value })}
@@ -94,20 +152,29 @@ const ProfileModal = () => {
           </View>
           <View style={styles.imageInputContainer}>
             <Typo color={colors.neutral200}>Proof of Transaction</Typo>
-            <ImageUpload
-              file={wallet.image}
-              onClear={() => setWallet({ ...wallet, image: null })}
-              onSelect={(file) => setWallet({ ...wallet, image: file})}
-              placeholder="Upload Image"
-            />
-          </View>
+           */}
         </ScrollView>
       </View>
 
       <View style={styles.footer}>
+        {oldWallet?.id && !loading && (
+          <Button
+            onPress={showDeleteAlert}
+            style={{
+              paddingHorizontal: spacingX._15,
+              backgroundColor: colors.neutral100,
+            }}
+          >
+            <Icons.TrashIcon
+              color={colors.white}
+              size={verticalScale(24)}
+              weight="bold"
+            />
+          </Button>
+        )}
         <Button onPress={onSubmit} loading={loading} style={{ flex: 1 }}>
           <Typo fontWeight={"700"} color={colors.black}>
-            Add Wallet
+            {oldWallet?.id ? "Update Wallet" : "Add Wallet"}
           </Typo>
         </Button>
       </View>
@@ -115,7 +182,7 @@ const ProfileModal = () => {
   );
 };
 
-export default ProfileModal;
+export default WalletModal;
 
 const styles = StyleSheet.create({
   container: {

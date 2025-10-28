@@ -1,4 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
@@ -6,12 +12,34 @@ import { verticalScale } from "@/utils/styling";
 import Typo from "@/components/Typo";
 import * as Icons from "phosphor-react-native";
 import { useRouter } from "expo-router";
+import useFetchData from "@/hooks/useFetchData";
+import { WalletType } from "@/types";
+import { orderBy, where } from "firebase/firestore";
+import { useAuth } from "@/context/authContext";
+import Loading from "@/components/Loading";
+import WalletListItem from "@/components/WalletListItem";
 
 const Wallet = () => {
-  const getTotalBalance = () => {
-    return 2344;
-  };
+  const { user } = useAuth();
   const router = useRouter();
+
+  const query: any = user?.uid
+    ? [where("uid", "==", user.uid), orderBy("created", "desc")]
+    : null;
+
+  const {
+    data: wallet,
+    error,
+    loading,
+  } = useFetchData<WalletType>("wallets", query);
+  // console.log("Wallet list", wallet.length, user?.uid);
+
+  const getTotalBalance = () => {
+    return wallet.reduce((total, item) => {
+      total = total + (item.amount || 0);
+      return total;
+    }, 0);
+  };
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
@@ -20,7 +48,7 @@ const Wallet = () => {
         <View style={styles.balanceView}>
           <View style={{ alignItems: "center" }}>
             <Typo size={45} fontWeight={"500"}>
-              ₹{getTotalBalance()?.toFixed(2)}
+              ₹{getTotalBalance()}
             </Typo>
             <Typo size={24} color={colors.neutral300}>
               Total Balance
@@ -32,7 +60,9 @@ const Wallet = () => {
             <Typo size={20} fontWeight={"500"}>
               My Wallets
             </Typo>
-            <TouchableOpacity onPress={() => router.push("/(modals)/walletModal")}>
+            <TouchableOpacity
+              onPress={() => router.push("/(modals)/walletModal")}
+            >
               <Icons.PlusCircleIcon
                 weight="fill"
                 color={colors.primary}
@@ -40,6 +70,18 @@ const Wallet = () => {
               />
             </TouchableOpacity>
           </View>
+
+          {/* Wallet List */}
+          {loading && <Loading />}
+          <FlatList
+            data={wallet}
+            renderItem={({ item, index }) => {
+              return (
+                <WalletListItem item={item} index={index} router={router} />
+              );
+            }}
+            contentContainerStyle={styles.listStyle}
+          />
         </View>
       </View>
     </ScreenWrapper>

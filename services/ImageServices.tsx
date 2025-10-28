@@ -10,6 +10,7 @@ export const uploadFileToCloudinary = async (
   folderName: string
 ): Promise<ResponseType> => {
   try {
+    if (!file) return { success: true, data: null };
     // If the file is already a string URL, return it directly
     if (typeof file === "string") {
       return { success: true, data: file };

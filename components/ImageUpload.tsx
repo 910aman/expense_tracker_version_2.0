@@ -51,7 +51,7 @@ const ImageUpload = ({
             contentFit="cover"
             source={getFilePath(file)}
           />
-          <TouchableOpacity style={styles.deleteIcon}>
+          <TouchableOpacity style={styles.deleteIcon} onPress={onClear}>
             <Icons.XCircleIcon
               size={verticalScale(24)}
               weight="fill"
@@ -86,5 +86,13 @@ const styles = StyleSheet.create({
     borderCurve: "continuous",
     overflow: "hidden",
   },
-  deleteIcon: {},
+  deleteIcon: {
+    position: "absolute",
+    top: scale(6),
+    right: scale(6),
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+  },
 });

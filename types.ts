@@ -160,7 +160,6 @@ export type ResponseType = {
 export type WalletType = {
   id?: string;
   name: string;
-  email: string;
   amount?: number;
   totalIncome?: number;
   totalExpenses?: number;
