@@ -20,9 +20,8 @@ const Login = () => {
   const { login: loginUser } = useAuth();
   const handleSubmit = async () => {
     // Handle login logic here
-     try {
+    try {
       const res = await loginUser(emailRef.current, pwdRef.current);
-      console.log("Response:", res);
 
       // Check if login failed
       if (!res || !res.success) {
@@ -84,7 +83,11 @@ const Login = () => {
             Forgot Password?
           </Typo>
 
-          <Button onPress={handleSubmit} loading={isLoading}>
+          <Button
+            onPress={handleSubmit}
+            loading={isLoading}
+            style={{ backgroundColor: colors.primary }}
+          >
             <Typo size={16} fontWeight={"600"} color={colors.white}>
               Login
             </Typo>

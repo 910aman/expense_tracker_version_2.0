@@ -36,7 +36,7 @@ const WalletModal = () => {
         image: oldWallet?.image,
       });
     }
-  }, []);
+  }, [oldWallet]);
 
   const onPickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -79,26 +79,25 @@ const WalletModal = () => {
     }
   };
 
- const onDelete = async () => {
-  if (!oldWallet?.id) return;
+  const onDelete = async () => {
+    if (!oldWallet?.id) return;
 
-  try {
-    setLoading(true);
-    const res = await deleteWallet(oldWallet.id);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const res = await deleteWallet(oldWallet.id);
+      setLoading(false);
 
-    if (res?.success) {
-      router.push("/(tabs)/wallet");
-    } else {
-      Alert.alert("Wallet", res?.msg || "Failed to delete wallet");
+      if (res?.success) {
+        router.push("/(tabs)/wallet");
+      } else {
+        Alert.alert("Wallet", res?.msg || "Failed to delete wallet");
+      }
+    } catch (error: any) {
+      setLoading(false);
+      console.error("Delete wallet error:", error);
+      Alert.alert("Wallet", "Something went wrong while deleting the wallet");
     }
-  } catch (error: any) {
-    setLoading(false);
-    console.error("Delete wallet error:", error);
-    Alert.alert("Wallet", "Something went wrong while deleting the wallet");
-  }
-};
-
+  };
 
   const showDeleteAlert = () => {
     Alert.alert(
@@ -162,7 +161,8 @@ const WalletModal = () => {
             onPress={showDeleteAlert}
             style={{
               paddingHorizontal: spacingX._15,
-              backgroundColor: colors.neutral100,
+              // backgroundColor: colors.neutral900,
+              backgroundColor: colors.rose,
             }}
           >
             <Icons.TrashIcon
@@ -172,7 +172,11 @@ const WalletModal = () => {
             />
           </Button>
         )}
-        <Button onPress={onSubmit} loading={loading} style={{ flex: 1 }}>
+        <Button
+          onPress={onSubmit}
+          loading={loading}
+          style={{ flex: 1, backgroundColor: colors.primary }}
+        >
           <Typo fontWeight={"700"} color={colors.black}>
             {oldWallet?.id ? "Update Wallet" : "Add Wallet"}
           </Typo>

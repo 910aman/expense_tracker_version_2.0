@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
@@ -21,15 +21,12 @@ const HomeCard = () => {
     orderBy("created", "desc"),
   ]);
 
-  // console.log('====================================');
-  // console.log("Data of the wallet",wallets);
-  // console.log('====================================');
   const getTotals = () => {
     return wallets.reduce(
       (totals: any, item: WalletType) => {
         totals.balance += Number(item.amount) || 0;
         totals.income += Number(item.totalIncome) || 0;
-        totals.expenses += Number(item.totalExpenses) || 0;
+        totals.expenses += Number(item.totalExpense) || 0;
         return totals;
       },
       { balance: 0, income: 0, expenses: 0 }
@@ -56,7 +53,7 @@ const HomeCard = () => {
             />
           </View>
           <Typo color={colors.black} size={30} fontWeight={"bold"}>
-            ₹ {getTotals()?.balance?.toFixed(2)}
+            ₹ {walletLoading ? "-----" : getTotals()?.balance?.toFixed(2)}
           </Typo>
         </View>
         <View style={styles.stats}>
@@ -76,7 +73,7 @@ const HomeCard = () => {
             </View>
             <View style={{ alignSelf: "center" }}>
               <Typo size={17} color={colors.green} fontWeight={"600"}>
-                ₹ {getTotals()?.income?.toFixed(2)}
+                ₹ {walletLoading ? "-----" : getTotals()?.income?.toFixed(2)}
               </Typo>
             </View>
           </View>
@@ -96,7 +93,7 @@ const HomeCard = () => {
             </View>
             <View style={{ alignSelf: "center" }}>
               <Typo size={17} color={colors.rose} fontWeight={"600"}>
-                ₹ {getTotals()?.expenses?.toFixed(2)}
+                ₹ {walletLoading ? "-----" : getTotals()?.expenses?.toFixed(2)}
               </Typo>
             </View>
           </View>

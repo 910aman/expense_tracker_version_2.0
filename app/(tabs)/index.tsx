@@ -1,5 +1,4 @@
 import {
-  FlatList,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -16,16 +15,27 @@ import HomeCard from "@/components/HomeCard";
 // import TransactionList from "@/components/TransactionList";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
-import { TransactionListType } from "@/types";
+import { TransactionType } from "@/types";
 
-import TransactionItem from "@/components/TransactionItem";
-import Loading from "@/components/Loading";
 import TransactionList from "@/components/TransactionList";
+import { limit, orderBy, where } from "firebase/firestore";
+import useFetchData from "@/hooks/useFetchData";
 
 const Home = () => {
   const { user } = useAuth();
   const router = useRouter();
-  console.log("Home Screen Rendered", user);
+
+  const constraints = [
+    where("uid", "==", user?.uid),
+    orderBy("date", "desc"),
+    limit(30),
+  ];
+
+  const {
+    data: recentTransaction,
+    error,
+    loading: trnasactionsLoading,
+  } = useFetchData<TransactionType>("transactions", constraints);
 
   return (
     <ScreenWrapper>
@@ -57,10 +67,10 @@ const Home = () => {
           </View>
 
           <TransactionList
+            data={recentTransaction}
+            loading={trnasactionsLoading}
             title="Recent Transactions"
-            data={[1, 2, 3, , 2, 3, 4, 5, 6, 1]}
             emptyListMessage="No Transactions added yet!"
-            loading={false}
           />
         </ScrollView>
         <Button
@@ -84,7 +94,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacingX._20,
-    // backgroundColor: "#fff",
     marginTop: verticalScale(8),
   },
   list: {
@@ -111,6 +120,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: verticalScale(30),
     right: verticalScale(30),
+    backgroundColor: colors.primary,
   },
   scrollViewStyle: {
     marginTop: spacingY._10,

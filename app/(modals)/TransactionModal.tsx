@@ -6,7 +6,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ModalWrapper from "@/components/ModalWrapper";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
@@ -26,7 +26,10 @@ import { useAuth } from "@/context/authContext";
 import { expenseCategories, transactionTypes } from "@/constants/data";
 import { CustomDateTimePicker } from "@/components/DateTimePicker";
 import Input from "@/components/Input";
-import { createOrUpdateTransaction } from "@/services/transactionServices";
+import {
+  createOrUpdateTransaction,
+  deleteTransaction,
+} from "@/services/transactionServices";
 
 const TransactionModal = () => {
   const [transaction, setTransaction] = useState<TransactionType>({
@@ -54,41 +57,33 @@ const TransactionModal = () => {
     loading: walletLoading,
   } = useFetchData<WalletType>("wallets", query);
 
-  //   const onDateChange = (event: any, selectedDate: any) => {
-  //     // const {type, nativeEvent: {timestamp, utcOffset}} = event;
-  //     const currentDate = selectedDate || transaction.date;
-  //     setTransaction({ ...transaction, date: currentDate });
-  //     setShowDatePicker(Platform.OS === "ios" ? true : false);
-  //   };
+  type paramType = {
+    id: string;
+    type: string;
+    amount: string;
+    category?: string;
+    date: string;
+    description?: string;
+    image?: any;
+    uid?: string;
+    walletId: string;
+  };
 
-  //   const onChange = (event: any, selectedDate?: Date) => {
-  //     // Android: user pressed cancel
-  //     if (Platform.OS === "android" && event.type === "dismissed") {
-  //       setShowDatePicker(false);
-  //       return;
-  //     }
+  const oldTransaction: paramType = useLocalSearchParams();
 
-  //     if (selectedDate) {
-  //       setTransaction((prev) => ({ ...prev, date: selectedDate }));
-  //     }
-
-  //     // Close picker after selection (for Android)
-  //     if (Platform.OS === "android") {
-  //       setShowDatePicker(false);
-  //     }
-  //   };
-
-  const oldTransaction: { name: string; image: string; id: string } =
-    useLocalSearchParams();
-
-  //   useEffect(() => {
-  //     if (oldTransaction?.id) {
-  //       setWallet({
-  //         name: oldTransaction?.name,
-  //         image: oldTransaction?.image,
-  //       });
-  //     }
-  //   }, []);
+  useEffect(() => {
+    if (oldTransaction?.id) {
+      setTransaction({
+        type: oldTransaction?.type,
+        amount: Number(oldTransaction?.amount),
+        description: oldTransaction?.description || "",
+        category: oldTransaction.category || "",
+        date: new Date(oldTransaction.date),
+        walletId: oldTransaction.walletId,
+        image: oldTransaction?.image || "",
+      });
+    }
+  }, [oldTransaction]);
 
   const onSubmit = async () => {
     const { type, amount, description, category, date, walletId, image } =
@@ -111,6 +106,7 @@ const TransactionModal = () => {
     };
     console.log("Transaction data", transactionData);
 
+    if (oldTransaction?.id) transactionData.uid = oldTransaction.id;
     setLoading(true);
     const res = await createOrUpdateTransaction(transactionData);
 
@@ -151,13 +147,16 @@ const TransactionModal = () => {
 
     try {
       setLoading(true);
-      const res = await deleteWallet(oldTransaction.id);
+      const res = await deleteTransaction(
+        oldTransaction.id,
+        oldTransaction.walletId
+      );
       setLoading(false);
 
       if (res?.success) {
-        router.push("/(tabs)/wallet");
+        router.push("/(tabs)");
       } else {
-        Alert.alert("Wallet", res?.msg || "Failed to delete wallet");
+        Alert.alert("Transaction", res?.msg || "Failed to delete wallet");
       }
     } catch (error: any) {
       setLoading(false);
@@ -169,7 +168,7 @@ const TransactionModal = () => {
   const showDeleteAlert = () => {
     Alert.alert(
       "Confirm",
-      "Are you sure you want to do this? \n This action will remove all the transactions related to this wallet",
+      "Are you sure you want to do delete this transaction?",
       [
         {
           text: "Cancel",
@@ -199,7 +198,7 @@ const TransactionModal = () => {
           {/* Transaction Type */}
           <View style={styles.inputContainer}>
             <Typo color={colors.neutral200} size={16}>
-              Wallet
+              Transaction Type
             </Typo>
             {/* Dropdown */}
             <Dropdown
@@ -332,7 +331,7 @@ const TransactionModal = () => {
           </View>
           <View style={styles.inputContainer}>
             <Typo color={colors.neutral200} size={16}>
-              Amoount
+              Amount
             </Typo>
             <Input
               keyboardType="numeric"
@@ -408,7 +407,7 @@ const TransactionModal = () => {
             onPress={showDeleteAlert}
             style={{
               paddingHorizontal: spacingX._15,
-              backgroundColor: colors.neutral100,
+              backgroundColor: colors.rose,
             }}
           >
             <Icons.TrashIcon
@@ -418,9 +417,13 @@ const TransactionModal = () => {
             />
           </Button>
         )}
-        <Button loading={loading} style={{ flex: 1 }} onPress={onSubmit}>
+        <Button
+          loading={loading}
+          style={{ flex: 1, backgroundColor: colors.primary }}
+          onPress={onSubmit}
+        >
           <Typo fontWeight={"700"} color={colors.black}>
-            {oldTransaction?.id ? "Update Wallet" : "Add Wallet"}
+            {oldTransaction?.id ? "Update Transaction" : "Add Transaction"}
           </Typo>
         </Button>
       </View>
