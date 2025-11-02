@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   list: {
     minHeight: 3,
-    marginTop: 10
+    marginTop: 0
   },
   row: {
     flexDirection: "row",

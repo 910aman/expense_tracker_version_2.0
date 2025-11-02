@@ -114,7 +114,7 @@ const TransactionModal = () => {
     if (res.success) {
       router.back();
     } else {
-      Alert.alert("Transaction", "Transaction Successfully added!");
+     Alert.alert("Transaction", res.msg ?? "Something went wrong");
     }
   };
   //     let { type, image } = transaction;
