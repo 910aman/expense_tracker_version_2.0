@@ -1,5 +1,5 @@
-import { StyleSheet, View } from "react-native";
-import React from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useMemo } from "react";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
 import { ImageBackground } from "expo-image";
@@ -9,29 +9,45 @@ import useFetchData from "@/hooks/useFetchData";
 import { WalletType } from "@/types";
 import { orderBy, where } from "firebase/firestore";
 import { useAuth } from "@/context/authContext";
+import { useRouter } from "expo-router";
 
 const HomeCard = () => {
   const { user } = useAuth();
+  const router = useRouter();
+  const constraints = useMemo(
+    () => [where("uid", "==", user?.uid), orderBy("created", "desc")],
+    [user?.uid]
+  );
+
+  const query: any = user?.uid ? constraints : null;
+
   const {
     data: wallets,
     error,
     loading: walletLoading,
-  } = useFetchData<WalletType>("wallets", [
-    where("uid", "==", user?.uid),
-    orderBy("created", "desc"),
-  ]);
+  } = useFetchData<WalletType>("wallets", query);
 
+  const cleanNumber = (value: any) => {
+    return Number(String(value).replace(/[^0-9.-]/g, "")) || 0;
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getTotals = () => {
+    if (!wallets?.length) return { balance: 0, income: 0, expense: 0 };
+    console.log("====================================");
+    console.log("Wallets", wallets);
+    console.log("====================================");
     return wallets.reduce(
       (totals: any, item: WalletType) => {
-        totals.balance += Number(item.amount) || 0;
-        totals.income += Number(item.totalIncome) || 0;
-        totals.expenses += Number(item.totalExpense) || 0;
+        totals.balance += cleanNumber(item.amount) || 0;
+        totals.income += cleanNumber(item.totalIncome) || 0;
+        totals.expense += cleanNumber(item.totalExpense) || 0;
         return totals;
       },
-      { balance: 0, income: 0, expenses: 0 }
+      { balance: 0, income: 0, expense: 0 }
     );
   };
+  const totals = useMemo(() => getTotals(), [getTotals]);
 
   return (
     <ImageBackground
@@ -39,11 +55,14 @@ const HomeCard = () => {
       resizeMode="stretch"
       style={styles.bgImage}
     >
-      <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => router.push("/(tabs)/statistics")}
+        style={styles.container}
+      >
         <View>
           {/* total balance */}
           <View style={styles.totalBalanceRow}>
-            <Typo color={colors.neutral800} size={17} fontWeight={"500"}>
+            <Typo color={colors.neutral800} size={17} fontWeight={"600"}>
               Total Balance
             </Typo>
             <Icons.DotsThreeOutlineIcon
@@ -53,7 +72,7 @@ const HomeCard = () => {
             />
           </View>
           <Typo color={colors.black} size={30} fontWeight={"bold"}>
-            ₹ {walletLoading ? "-----" : getTotals()?.balance?.toFixed(2)}
+            ₹ {walletLoading ? "-----" : totals?.balance?.toFixed(2)}
           </Typo>
         </View>
         <View style={styles.stats}>
@@ -67,13 +86,13 @@ const HomeCard = () => {
                   weight="bold"
                 />
               </View>
-              <Typo fontWeight={"500"} size={16} color={colors.neutral700}>
+              <Typo fontWeight={"700"} size={16} color={colors.neutral700}>
                 Income
               </Typo>
             </View>
             <View style={{ alignSelf: "center" }}>
               <Typo size={17} color={colors.green} fontWeight={"600"}>
-                ₹ {walletLoading ? "-----" : getTotals()?.income?.toFixed(2)}
+                ₹ {walletLoading ? "-----" : totals?.income?.toFixed(2)}
               </Typo>
             </View>
           </View>
@@ -87,18 +106,18 @@ const HomeCard = () => {
                   weight="bold"
                 />
               </View>
-              <Typo fontWeight={"500"} size={16} color={colors.neutral700}>
+              <Typo fontWeight={"600"} size={16} color={colors.neutral700}>
                 Expense
               </Typo>
             </View>
             <View style={{ alignSelf: "center" }}>
               <Typo size={17} color={colors.rose} fontWeight={"600"}>
-                ₹ {walletLoading ? "-----" : getTotals()?.expenses?.toFixed(2)}
+                ₹ {walletLoading ? "-----" : totals?.expense?.toFixed(2)}
               </Typo>
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     </ImageBackground>
   );
 };

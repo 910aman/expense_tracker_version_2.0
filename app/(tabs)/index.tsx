@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/context/authContext";
@@ -25,11 +25,11 @@ const Home = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  const constraints = [
+  const constraints = useMemo(() => [
     where("uid", "==", user?.uid),
     orderBy("date", "desc"),
     limit(30),
-  ];
+  ], [user?.uid]);
 
   const {
     data: recentTransaction,

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
@@ -23,9 +23,14 @@ const Wallet = () => {
   const { user } = useAuth();
   const router = useRouter();
 
+  const constraints = useMemo(
+    () => [where("uid", "==", user?.uid), orderBy("created", "desc")],
+    [user?.uid]
+  );
+
   const query: any = user?.uid
-    ? [where("uid", "==", user.uid), orderBy("created", "desc")]
-    : null;
+  ? constraints : null;
+    // ? [where("uid", "==", user.uid), orderBy("created", "desc")]
 
   const {
     data: wallet,

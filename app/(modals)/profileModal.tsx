@@ -41,7 +41,7 @@ const ProfileModal = () => {
       email: user?.email || "",
       image: user?.image || null,
     });
-  }, [user?.email, user?.image, user?.name]);
+  }, [user]);
 
   const onPickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({

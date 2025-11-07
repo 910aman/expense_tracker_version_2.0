@@ -6,7 +6,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ModalWrapper from "@/components/ModalWrapper";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
@@ -47,9 +47,11 @@ const TransactionModal = () => {
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const query: any = user?.uid
-    ? [where("uid", "==", user.uid), orderBy("created", "desc")]
-    : null;
+  const query: any = useMemo(() => {
+    return user?.uid
+      ? [where("uid", "==", user.uid), orderBy("created", "desc")]
+      : null;
+  }, [user?.uid]);
 
   const {
     data: wallets,
@@ -83,7 +85,17 @@ const TransactionModal = () => {
         image: oldTransaction?.image || "",
       });
     }
-  }, [oldTransaction]);
+  }, [oldTransaction?.id]);
+
+  // useEffect(() => {
+  //   if (!oldTransaction || !oldTransaction.id) return;
+  //   setTransaction((prev) => ({
+  //     ...prev,
+  //     ...oldTransaction,
+  //     amount: Number(oldTransaction.amount),
+  //     date: new Date(oldTransaction.date),
+  //   }));
+  // }, [oldTransaction, oldTransaction.id]); // ✅ Only reacts when id changes, not on object reference change
 
   const onSubmit = async () => {
     const { type, amount, description, category, date, walletId, image } =
@@ -114,7 +126,7 @@ const TransactionModal = () => {
     if (res.success) {
       router.back();
     } else {
-     Alert.alert("Transaction", res.msg ?? "Something went wrong");
+      Alert.alert("Transaction", res.msg ?? "Something went wrong");
     }
   };
   //     let { type, image } = transaction;

@@ -253,7 +253,7 @@ const Statistics = () => {
                 yAxisLabelPrefix="₹"
                 yAxisThickness={0}
                 xAxisThickness={0}
-                yAxisLabelWidth={scale(50)}
+                yAxisLabelWidth={scale(70)}
                 yAxisTextStyle={{ color: colors.neutral350 }}
                 xAxisLabelTextStyle={{
                   color: colors.neutral350,

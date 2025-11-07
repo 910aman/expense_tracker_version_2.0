@@ -12,38 +12,79 @@ import {
 } from "firebase/firestore";
 import { fireStore } from "@/config/firebase";
 
+// export const createOrUpdateWallet = async (
+//   walletData: Partial<WalletType>
+// ): Promise<ResponseType> => {
+//   try {
+//     let walletToSave = { ...walletData };
+//     if (walletData.image) {
+//       const imageUploadRes = await uploadFileToCloudinary(
+//         walletData.image,
+//         "wallets"
+//       );
+//       if (!imageUploadRes.success) {
+//         return {
+//           success: false,
+//           msg: imageUploadRes.msg || "Failed to upload wallet icon",
+//         };
+//       }
+//       walletToSave.image = imageUploadRes.data;
+//     }
+//     if (!walletData?.id) {
+//       walletToSave.amount = 0;
+//       walletToSave.totalIncome = 0;
+//       walletToSave.totalExpense = 0;
+//       walletToSave.created = new Date();
+//     }
+//     const walletRef = walletData?.id
+//       ? doc(fireStore, "wallets", walletData?.id)
+//       : doc(collection(fireStore, "wallets"));
+
+//     await setDoc(walletRef, walletToSave, { merge: true });
+//     return { success: true, data: { ...walletToSave, id: walletRef.id } };
+//   } catch (error: any) {
+//     console.log("Error updating error: ", error);
+//     return { success: false, msg: error?.message };
+//   }
+// };
+
 export const createOrUpdateWallet = async (
   walletData: Partial<WalletType>
 ): Promise<ResponseType> => {
   try {
     let walletToSave = { ...walletData };
-    if (walletData.image) {
-      const imageUploadRes = await uploadFileToCloudinary(
-        walletData.image,
-        "wallets"
-      );
+
+    // ✅ Only upload image if it's a file, not an already uploaded URL
+    if (walletData.image && typeof walletData.image === "object" && walletData.image.uri) {
+      const imageUploadRes = await uploadFileToCloudinary(walletData.image, "wallets");
+
       if (!imageUploadRes.success) {
         return {
           success: false,
           msg: imageUploadRes.msg || "Failed to upload wallet icon",
         };
       }
-      walletToSave.image = imageUploadRes.data;
+
+      walletToSave.image = imageUploadRes.data; // cloudinary URL
     }
+
+    // ✅ Add default values ONLY on create
     if (!walletData?.id) {
       walletToSave.amount = 0;
       walletToSave.totalIncome = 0;
       walletToSave.totalExpense = 0;
       walletToSave.created = new Date();
     }
+
     const walletRef = walletData?.id
-      ? doc(fireStore, "wallets", walletData?.id)
-      : doc(collection(fireStore, "wallets"));
+      ? doc(fireStore, "wallets", walletData.id)   // UPDATE
+      : doc(collection(fireStore, "wallets"));     // CREATE
 
     await setDoc(walletRef, walletToSave, { merge: true });
+
     return { success: true, data: { ...walletToSave, id: walletRef.id } };
   } catch (error: any) {
-    console.log("Error updating error: ", error);
+    console.log("Error updating wallet: ", error);
     return { success: false, msg: error?.message };
   }
 };

@@ -21,13 +21,13 @@ const useFetchData = <T>(
     const collectionRef = collection(fireStore, collectionName);
     const q = query(collectionRef, ...constraints);
 
-    const unSub = onSnapshot(
+    const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
         const fetchData = snapshot.docs.map((doc) => {
           return {
-            id: doc.id,
-            ...doc.data(),
+          id: doc.id,
+          ...doc.data(),
           };
         }) as T[];
         setData(fetchData);
@@ -39,8 +39,9 @@ const useFetchData = <T>(
         setLoading(false);
       }
     );
-    return () => unSub();
-  });
+    return () => unsubscribe();
+  }, [collectionName, constraints]);
+
   return { data, loading, error };
 };
 

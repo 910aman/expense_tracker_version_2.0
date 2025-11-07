@@ -11,7 +11,6 @@ import { WalletType } from "@/types";
 import Button from "@/components/Button";
 import { useAuth } from "@/context/authContext";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
 import ImageUpload from "@/components/ImageUpload";
 import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
 import * as Icons from "phosphor-react-native";
@@ -36,22 +35,7 @@ const WalletModal = () => {
         image: oldWallet?.image,
       });
     }
-  }, [oldWallet]);
-
-  const onPickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      // allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.5,
-    });
-
-    console.log("result.assets Value = ", result.assets);
-
-    if (!result.canceled) {
-      //   setWallet({ ...wallet, image: result.assets[0].uri });
-    }
-  };
+  }, [oldWallet?.id]);
 
   const onSubmit = async () => {
     let { name, image } = wallet;

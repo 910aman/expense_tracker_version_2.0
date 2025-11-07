@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View } from "react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ModalWrapper from "@/components/ModalWrapper";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
@@ -18,11 +18,11 @@ const SearchModal = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const constraints = [
+  const constraints = useMemo(() => [
     where("uid", "==", user?.uid),
     orderBy("date", "desc"),
     limit(30),
-  ];
+  ], [user?.uid]);
 
   const {
     data: allTransactions,

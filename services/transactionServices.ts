@@ -114,6 +114,7 @@ const revertAndUpdateWallets = async (
     const revertedIncomeExpenseAmount =
       Number(originalWallet[revertType]) - Number(oldTransaction.amount);
 
+    // if user tries to convert income to expense on the same wallet
     if (newTransactionType === "expense") {
       // convert from income to expense
       if (
@@ -153,8 +154,8 @@ const revertAndUpdateWallets = async (
 
     const updatedTransactionAmount: number =
       newTransactionType === "income"
-        ? Number(newTransactionAmount)
-        : -Number(newTransactionAmount);
+        ? Number(newWallet.totalIncome) + newTransactionAmount
+        : Number(newWallet.totalExpense) +   newTransactionAmount;
 
     const newWalletAmount = Number(newWallet.amount) + updatedTransactionAmount;
 
@@ -203,8 +204,8 @@ const updateWalletForNewTransaction = async (
 
     const updatedTotals =
       type === "income"
-        ? Number(walletData.amount) + amount
-        : Number(walletData.amount) - amount;
+        ? Number(walletData.totalIncome) + amount
+        : Number(walletData.totalExpense) + amount;
 
     await updateDoc(walletRef, {
       amount: updatedWalletAmount,
@@ -246,7 +247,7 @@ export const deleteTransaction = async (
 
     const newIncomeExpenseAmount = walletData[updateType]! - transactionAmount;
 
-    if (TransactionType === "expense" && newWalletAmount < 0) {
+    if (TransactionType === "income" && newWalletAmount < 0) {
       return { success: false, msg: "You cannot delete this transaction" };
     }
 
@@ -325,8 +326,11 @@ export const fetchWeeklyStats = async (uid: string): Promise<ResponseType> => {
       },
     };
   } catch (error: any) {
- console.log("Error fetching weekly transaction", error);
-    return { success: false, msg: error.message || "Failed to fetch weekly transactions"};
+    console.log("Error fetching weekly transaction", error);
+    return {
+      success: false,
+      msg: error.message || "Failed to fetch weekly transactions",
+    };
   }
 };
 
@@ -394,7 +398,10 @@ export const fetchMonthlyStats = async (uid: string): Promise<ResponseType> => {
     };
   } catch (error: any) {
     console.log("Error fetching monthly transaction", error);
-    return { success: false, msg: error.message || "Failed to fetch monthly transactions"};
+    return {
+      success: false,
+      msg: error.message || "Failed to fetch monthly transactions",
+    };
   }
 };
 
@@ -419,7 +426,7 @@ export const fetchYearlyStats = async (uid: string): Promise<ResponseType> => {
     const firstYear = firstTransaction.getFullYear();
     const currentYear = new Date().getFullYear();
 
-    const yearlyData = getYearsRange(firstYear, currentYear); 
+    const yearlyData = getYearsRange(firstYear, currentYear);
 
     // maping each transaction in day
     querySnapshot.forEach((doc) => {
@@ -427,7 +434,9 @@ export const fetchYearlyStats = async (uid: string): Promise<ResponseType> => {
       transaction.id = doc.id;
       transactions.push(transaction);
 
-      const transactionYear = (transaction.date as Timestamp).toDate().getFullYear();
+      const transactionYear = (transaction.date as Timestamp)
+        .toDate()
+        .getFullYear();
 
       const yearData = yearlyData.find(
         (item: any) => item.year === transactionYear.toString()
@@ -443,7 +452,7 @@ export const fetchYearlyStats = async (uid: string): Promise<ResponseType> => {
     });
 
     // takes each day and creates entry
-    const stats = yearlyData.flatMap((year:any) => [
+    const stats = yearlyData.flatMap((year: any) => [
       {
         value: year.income,
         label: year.year,
@@ -463,6 +472,9 @@ export const fetchYearlyStats = async (uid: string): Promise<ResponseType> => {
     };
   } catch (error: any) {
     console.log("Error fetching yearly transaction", error);
-    return { success: false, msg: error.message || "Failed to fetch yearly transactions"};
+    return {
+      success: false,
+      msg: error.message || "Failed to fetch yearly transactions",
+    };
   }
 };
