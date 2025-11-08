@@ -7,7 +7,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -25,9 +25,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           name: firebaseUser.displayName || null,
         });
         updateUserData(firebaseUser.uid);
-        console.log('====================================');
-        console.log("Data of the User", firebaseUser);
-        console.log('====================================');
+        // console.log('====================================');
+        // console.log("Data of the User", firebaseUser);
+        // console.log('====================================');
         router.replace("/(tabs)");
       } else {
         setUser(null);

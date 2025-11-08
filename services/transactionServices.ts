@@ -155,7 +155,7 @@ const revertAndUpdateWallets = async (
     const updatedTransactionAmount: number =
       newTransactionType === "income"
         ? Number(newWallet.totalIncome) + newTransactionAmount
-        : Number(newWallet.totalExpense) +   newTransactionAmount;
+        : Number(newWallet.totalExpense) - newTransactionAmount;
 
     const newWalletAmount = Number(newWallet.amount) + updatedTransactionAmount;
 

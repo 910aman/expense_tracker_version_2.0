@@ -105,8 +105,7 @@ const TransactionModal = () => {
       return;
     }
 
-    console.log("Goog to go");
-    const transactionData = {
+    let transactionData: TransactionType =  {
       type,
       amount,
       description,
@@ -118,7 +117,7 @@ const TransactionModal = () => {
     };
     console.log("Transaction data", transactionData);
 
-    if (oldTransaction?.id) transactionData.uid = oldTransaction.id;
+    if (oldTransaction?.id) transactionData.id = oldTransaction.id;
     setLoading(true);
     const res = await createOrUpdateTransaction(transactionData);
 

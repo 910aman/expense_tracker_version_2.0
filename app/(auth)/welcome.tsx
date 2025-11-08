@@ -66,7 +66,7 @@ const Welcome = () => {
           >
             {/* Button Component */}
             <Button
-              onPress={() => router.push("/(tabs)/profile")}
+              onPress={() => router.push("/(auth)/register")}
               style={{ backgroundColor: colors.primary }}
             >
               <Typo size={22} color={colors.neutral900} fontWeight="600">

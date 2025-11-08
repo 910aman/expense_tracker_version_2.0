@@ -25,7 +25,7 @@ const ImageUpload = ({
       quality: 0.5,
     });
 
-    console.log("result.assets Value = ", result.assets);
+    // console.log("result.assets Value = ", result.assets);
 
     if (!result.canceled) {
       onSelect(result.assets[0].uri);

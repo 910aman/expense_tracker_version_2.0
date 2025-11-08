@@ -34,9 +34,9 @@ const HomeCard = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getTotals = () => {
     if (!wallets?.length) return { balance: 0, income: 0, expense: 0 };
-    console.log("====================================");
-    console.log("Wallets", wallets);
-    console.log("====================================");
+    // console.log("====================================");
+    // console.log("Wallets", wallets);
+    // console.log("====================================");
     return wallets.reduce(
       (totals: any, item: WalletType) => {
         totals.balance += cleanNumber(item.amount) || 0;
