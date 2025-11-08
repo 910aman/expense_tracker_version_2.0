@@ -11,13 +11,15 @@ import { useRouter } from "expo-router";
 const welcomeImage = "../../images/welcome.png";
 
 const Welcome = () => {
-
   const router = useRouter();
 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.loginButton}  onPress={() => router.push("/(auth)/login")}>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => router.push("/(auth)/login")}
+        >
           <Typo size={16} color={colors.neutral100} fontWeight="700">
             Sign in
           </Typo>
@@ -44,7 +46,9 @@ const Welcome = () => {
             entering={FadeInDown.duration(1000)
               .delay(100)
               .springify()
-              .damping(12)} style={{ alignItems: "center", gap: 1 }}>
+              .damping(12)}
+            style={{ alignItems: "center", gap: 1 }}
+          >
             <Typo size={17} color={colors.textLight}>
               Finances must be arranged to set a better
             </Typo>
@@ -57,9 +61,14 @@ const Welcome = () => {
             entering={FadeInDown.duration(1000)
               .delay(200)
               .springify()
-              .damping(12)} style={styles.buttonContainer}>
+              .damping(12)}
+            style={styles.buttonContainer}
+          >
             {/* Button Component */}
-            <Button onPress={() => router.push("/(tabs)/profile")}>
+            <Button
+              onPress={() => router.push("/(auth)/register")}
+              style={{ backgroundColor: colors.primary }}
+            >
               <Typo size={22} color={colors.neutral900} fontWeight="600">
                 Get Started
               </Typo>

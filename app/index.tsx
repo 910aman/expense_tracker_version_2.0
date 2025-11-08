@@ -11,7 +11,7 @@ export default function Index() {
     setTimeout(() => {
       router.push("/(auth)/welcome");
     }, 2000);
-  },[]);
+  },[router]);
 
   return (
     <View style={styles.container}>

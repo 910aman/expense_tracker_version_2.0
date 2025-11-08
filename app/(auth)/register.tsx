@@ -32,7 +32,7 @@ const Register = () => {
       pwdRef.current
     );
     console.log("Responses", res);
-    if(!res.success){
+    if (!res.success) {
       Alert.alert("Sign Up", res.msg || "An error occurred during sign up");
       setIsLoading(false);
       return;
@@ -91,7 +91,11 @@ const Register = () => {
             }
           />
 
-          <Button onPress={handleSubmit} loading={isLoading}>
+          <Button
+            onPress={handleSubmit}
+            loading={isLoading}
+            style={{ backgroundColor: colors.primary }}
+          >
             <Typo size={16} fontWeight={"600"} color={colors.white}>
               Sign Up
             </Typo>

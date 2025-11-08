@@ -51,8 +51,6 @@ const ProfileModal = () => {
       quality: 0.5,
     });
 
-    console.log("result.assets Value = ", result.assets);
-
     if (!result.canceled) {
       setUserData({ ...userData, image: result.assets[0].uri });
     }
@@ -123,7 +121,11 @@ const ProfileModal = () => {
       </View>
 
       <View style={styles.footer}>
-        <Button onPress={onSubmit} loading={loading} style={{ flex: 1 }}>
+        <Button
+          onPress={onSubmit}
+          loading={loading}
+          style={{ flex: 1, backgroundColor: colors.primary }}
+        >
           <Typo fontWeight={"700"} color={colors.black}>
             Update
           </Typo>

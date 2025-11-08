@@ -8,7 +8,7 @@ import Loading from "./Loading";
 const Button = ({ style, onPress, loading, children }: CustomButtonProps) => {
   if (loading) {
     return (
-      <View style={[style, styles.button,{backgroundColor: 'transparent'}]}>
+      <View style={[style, styles.button]}>
         <Loading />
       </View>
     );
@@ -28,7 +28,6 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.primary,
     borderRadius: radius._17,
     borderCurve: "continuous",
     height: verticalScale(52),
